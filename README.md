@@ -15,9 +15,7 @@ The lightweight plugin with keyboard support.
 
 ## Usage 
 
-markup
-$(selector).select(options)
-end
+	$(selector).select(options)
 
 $(selector) - could be html or select element
 
