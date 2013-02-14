@@ -1,7 +1,7 @@
 Custom-select-jQuery-plugin
 ===========================
 
-## Lightweight jquery custom plugin
+## Lightweight jquery plugin custom select
 
 The lightweight plugin with keyboard support.
 
