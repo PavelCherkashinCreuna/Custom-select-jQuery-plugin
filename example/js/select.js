@@ -4,7 +4,7 @@
 		init: function ( options , elem , selector ) {
 			this.selector = selector;
 			this.selectMarkup = '<div class="select"><div class="select-holder"><a class="select-inner" href="#"></a></div><ul class="select-drop dropdown-menu"></ul></div>';
-			this.optionMarkup = '<li class="optionItem" data-value={{value}}><a href="#">{{title}}</a></li>';
+			this.optionMarkup = '<li class="option-item" data-value={{value}}><a href="#">{{title}}</a></li>';
 			this.onSelect = options.onSelect;
 			this.$container = $(elem);
 			if (this.$container[0].nodeName.toLowerCase() === 'select') {
@@ -21,7 +21,7 @@
 		getDOM: function () {
 			this.$elem = this.$container.find('.select-inner');
 			this.$optionsContainer = this.$container.find('.select-drop');
-			this.$options = this.$optionsContainer.find('.optionItem');
+			this.$options = this.$optionsContainer.find('.option-item');
 		},
 		animationEvent: function () {
 			var t,
@@ -140,7 +140,7 @@
 				e.preventDefault();
 				that.toggleState();
 			});
-			this.$optionsContainer.on('click', '.optionItem' , function (e) {
+			this.$optionsContainer.on('click', '.option-item' , function (e) {
 				e.preventDefault();
 				if (!$(this).hasClass('active')) {
 					that.update($(this));
@@ -192,7 +192,7 @@
 			this.$optionsContainer.empty()
 								  .append(options);
 
-			this.$options = this.$optionsContainer.find('.optionItem');
+			this.$options = this.$optionsContainer.find('.option-item');
 			this.setInitial();
 		},
 		replaceSelect: function ( select ) {
