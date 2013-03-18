@@ -78,6 +78,7 @@
 			this.$container.data($item.data());
 			if (this.isSelect) {
 				this.select.val($item.data('value'));
+				this.select.trigger('change');
 			}
 		},
 		setInitial: function () {
