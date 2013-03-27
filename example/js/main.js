@@ -4,7 +4,7 @@ $(function () {
 			console.log(event,elem)
 		}
 	});
-	selectInst1 = $('#select').select({
+	selectInst1 = $('.select-for-replace').select({
 		onSelect: function (event,elem) {
 			console.log(event,elem)
 		}

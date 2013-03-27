@@ -6,6 +6,7 @@
 			this.selectMarkup = '<div class="select"><div class="select-holder"><a class="select-inner" href="#"></a></div><ul class="select-drop dropdown-menu"></ul></div>';
 			this.optionMarkup = '<li class="option-item" data-value={{value}}><a href="#">{{title}}</a></li>';
 			this.onSelect = options.onSelect;
+			this.timeStep = Date.now();
 			this.$container = $(elem);
 			if (this.$container[0].nodeName.toLowerCase() === 'select') {
 				this.replaceSelect(this.$container);
@@ -15,6 +16,7 @@
 				this.setInitial();
 			}
 			this.attachEvents();
+			this.durationPropName = this.getDurationPropName();
 			this.callbackEvent = this.animationEvent();
 			return this;
 		},
@@ -22,6 +24,23 @@
 			this.$elem = this.$container.find('.select-inner');
 			this.$optionsContainer = this.$container.find('.select-drop');
 			this.$options = this.$optionsContainer.find('.option-item');
+		},
+		getDurationPropName: function () {
+			var t,
+				el = document.createElement('fakeelement'),
+				transitions = {
+					'transition': 'transition-duration',
+					'OTransition': '-o-transition-duration',
+					'MozTransition': '-moz-transition-duration',
+					'WebkitTransition': '-webkit-transition-duration'
+				};
+
+			for(t in transitions){
+				if( el.style[t] !== undefined ){
+					return transitions[t];
+				}
+			}
+			return false;
 		},
 		animationEvent: function () {
 			var t,
@@ -38,37 +57,37 @@
 					return transitions[t];
 				}
 			}
+			return false;
 		},
-		openCallback: function (elem) {
-			this.bindCloseEvents();
+		openCallback: function (event,elem) {
+			this.bindCloseEvents(event,elem);
 		},
-		toggleState: function () {
+		toggleState: function (e, elem) {
 			var that = this;
 			if (that.$container.hasClass('select-opened')) {
 				that.$container.removeClass('select-opened');
 			} else {
 				that.$container.addClass('select-opened');
 				if (this.callbackEvent) {
-					that.$optionsContainer[0].addEventListener(that.callbackEvent, function callback(event) {
-						if (event.propertyName == 'opacity') {
-							that.$optionsContainer[0].removeEventListener(that.callbackEvent, callback , false);
-							that.openCallback();
-						}
-					}, false);
+					if (!parseFloat(that.$optionsContainer.css(this.durationPropName))) {
+						that.openCallback(e, elem);
+					} else {
+						that.$optionsContainer[0].addEventListener(that.callbackEvent, function callback(event) {
+							if (event.propertyName == 'opacity') {
+								that.$optionsContainer[0].removeEventListener(that.callbackEvent, callback , false);
+								that.openCallback(e, elem);
+							}
+						}, false);
+
+					}
 				} else {
-					setTimeout(function (){
-						that.openCallback();
-					},0);
+					that.openCallback();
 				}
-				
 			}
 		},
 		close: function ( event , forceClose ) {
-			var elem = $(event.target);
-			if ( forceClose || !elem.parents(this.selector).length ) {
-					this.$container.removeClass('select-opened');
-					this.unbindCloseEvents();
-			}
+			this.$container.removeClass('select-opened');
+			this.unbindCloseEvents();
 		},
 		update: function ( $item ) {
 			this.$options.filter('.active')
@@ -94,26 +113,28 @@
 			$(document).off('keyup.select');
 			this.kbControlEvents(false);
 		},
-		bindCloseEvents: function ( event ) {
+		bindCloseEvents: function ( event, elem ) {
 			var that = this,
 				text = '';
 
-			$(document).on('keyup.select' , function (e) {
+			$(document).on('keyup.select' + this.timeStep , function (e) {
 				if (e.which == '27' || e.which == '9') {
-					that.close( e , true );
+					that.close();
 				}
 				// TODO: implement search
 			});
-			$(document).on('click.select', function (e) {
-				that.close(e);
+			$(document).on('click.select' + this.timeStep, function (e) {
+				if (e.target !== elem[0]) {
+					that.close();
+				}
 			});
 			that.kbControlEvents(true);
 		},
 		kbControlEvents: function ( bind ) {
 			var that = this;
-			$(document).off('keydown.select-control');
+			$(document).off('keydown.select-control' + this.timeStep);
 			if (bind) {
-				$(document).on('keydown.select-control' , function (e) {
+				$(document).on('keydown.select-control' + this.timeStep , function (e) {
 					if (e.which == '40') {
 						that.updateByKeyboard('next');
 					} else if (e.which == '38' ) {
@@ -138,7 +159,7 @@
 			var that = this;
 			this.$elem.on('click' , function (e) {
 				e.preventDefault();
-				that.toggleState();
+				that.toggleState(e, $(this));
 			});
 			this.$optionsContainer.on('click', '.option-item' , function (e) {
 				e.preventDefault();
@@ -148,15 +169,6 @@
 						that.onSelect(e,$(this));
 					}
 				}
-				that.close({});
-			});
-			this.$elem.on('focusin' , function () {
-				that.$elem.addClass('focused');
-				that.kbControlEvents(true);
-			});
-			this.$elem.on('focusout' , function () {
-				that.$elem.removeClass('focused');
-				that.kbControlEvents(false);
 			});
 		},
 		get: function () {
