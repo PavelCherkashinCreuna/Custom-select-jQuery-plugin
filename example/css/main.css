@@ -325,6 +325,9 @@ textarea {
        -o-transition: all 0.1s ease-out;  /* Opera 10.5–12.00 */
           transition: all 0.1s ease-out;  /* Firefox 16+, Opera 12.50+ */
 }
+.select-drop a:focus {
+    border: 1px solid black;
+}
 .select-inner {
     display: block;
     padding: 8px 14px;

@@ -159,14 +159,16 @@
 			var that = this;
 			this.$elem.on('click' , function (e) {
 				e.preventDefault();
+				$(this).focus();
 				that.toggleState(e, $(this));
 			});
-			this.$optionsContainer.on('click', '.option-item' , function (e) {
+			this.$optionsContainer.on('click', '.option-item > a' , function (e) {
 				e.preventDefault();
-				if (!$(this).hasClass('active')) {
-					that.update($(this));
+				var $elem = $(this).parent();
+				if (!$elem.hasClass('active')) {
+					that.update($elem);
 					if (typeof that.onSelect === 'function') {
-						that.onSelect(e,$(this));
+						that.onSelect(e,$elem);
 					}
 				}
 			});
