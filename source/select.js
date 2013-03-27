@@ -81,7 +81,7 @@
 
 					}
 				} else {
-					that.openCallback();
+					that.openCallback(e, elem);
 				}
 			}
 		},
